@@ -49,6 +49,30 @@ def main():
     
     # Load model
     model = create_model(**model_config)
+    
+    ## Debug: Print out model configs
+    logger.info("=" * 60)
+    logger.info("Model Configuration:")
+    logger.info("=" * 60)
+    logger.info(f"image_size: {model_config.get('image_size', 'NOT SET')}")
+    logger.info(f"num_channels: {model_config.get('num_channels', 'NOT SET')}")
+    logger.info(f"num_res_blocks: {model_config.get('num_res_blocks', 'NOT SET')}")
+    logger.info(f"channel_mult: {model_config.get('channel_mult', 'NOT SET')}")
+    logger.info(f"learn_sigma: {model_config.get('learn_sigma', 'NOT SET')}")
+    logger.info(f"class_cond: {model_config.get('class_cond', 'NOT SET')}")
+    logger.info(f"attention_resolutions: {model_config.get('attention_resolutions', 'NOT SET')}")
+    logger.info(f"num_heads: {model_config.get('num_heads', 'NOT SET')}")
+    logger.info(f"num_head_channels: {model_config.get('num_head_channels', 'NOT SET')}")
+    logger.info(f"num_heads_upsample: {model_config.get('num_heads_upsample', 'NOT SET')}")
+    logger.info(f"dropout: {model_config.get('dropout', 'NOT SET')}")
+    logger.info(f"use_checkpoint: {model_config.get('use_checkpoint', 'NOT SET')}")
+    logger.info(f"use_scale_shift_norm: {model_config.get('use_scale_shift_norm', 'NOT SET')}")
+    logger.info(f"resblock_updown: {model_config.get('resblock_updown', 'NOT SET')}")
+    logger.info(f"use_fp16: {model_config.get('use_fp16', 'NOT SET')}")
+    logger.info(f"use_new_attention_order: {model_config.get('use_new_attention_order', 'NOT SET')}")
+    logger.info(f"model_path: {model_config.get('model_path', 'NOT SET')}")
+    logger.info("=" * 60)
+    
     model = model.to(device)
     model.eval()
 
@@ -76,7 +100,10 @@ def main():
 
     # Prepare dataloader
     data_config = task_config['data']
+    image_size = data_config.get('image_size', 256) # Default image size
     transform = transforms.Compose([transforms.ToTensor(),
+                                    transforms.Resize(image_size),
+                                    transforms.CenterCrop(image_size),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     dataset = get_dataset(**data_config, transforms=transform)
     loader = get_dataloader(dataset, batch_size=1, num_workers=0, train=False)
@@ -88,6 +115,7 @@ def main():
         )
         
     # Do Inference
+    _ = input("Press Enter to start samping...")
     for i, ref_img in enumerate(loader):
         logger.info(f"Inference for image {i}")
         fname = str(i).zfill(5) + '.png'

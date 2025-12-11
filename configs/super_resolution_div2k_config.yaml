@@ -5,7 +5,7 @@ conditioning:
 
 data:
   name: imagenet
-  root: ./data/samples/
+  root: ./data/DIV2K_HR_test_30
   image_size: 256
   
 measurement:
